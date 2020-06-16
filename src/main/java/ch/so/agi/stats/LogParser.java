@@ -43,8 +43,15 @@ public class LogParser {
 
                 List<NameValuePair> params = URLEncodedUtils.parse(new URI(decodedQueryString), Charset.forName("UTF-8"));
 
+                //log.info(decodedQueryString);
                 for (NameValuePair param : params) {
-                    System.out.println(param.getName() + " : " + param.getValue());
+                    //System.out.println(param.getName() + " : " + param.getValue());
+                    
+                    
+                    if (param.getName().equalsIgnoreCase("LAYERS") && param.getValue().length() > 40) {
+                        //log.error("FUUUUUUBAR");
+                        System.out.println(param.getName() + " : " + param.getValue());
+                    }
                 }
 
                
@@ -55,6 +62,8 @@ public class LogParser {
         
     }
     
+    
+    // https://databricks.gitbooks.io/databricks-spark-reference-applications/content/logs_analyzer/chapter1/java8/src/main/java/com/databricks/apps/logs/ApacheAccessLog.java
     
     public String parseFromLogLine(String logline) {
         Matcher m = PATTERN.matcher(logline);
