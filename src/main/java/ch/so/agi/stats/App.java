@@ -8,7 +8,7 @@ public class App {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, URISyntaxException {
         LogParser logparser = new LogParser();
-        logparser.parse("/Users/stefan/tmp/access1.log");
+        logparser.parse("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
         
         
         

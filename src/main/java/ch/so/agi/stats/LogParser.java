@@ -33,26 +33,41 @@ public class LogParser {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (i>1000) continue;
+                //if (i>10000) break;
                 
+                Matcher m = parseFromLogLine(line);
                 
+                if (m == null) {
+                    continue;
+                }                
                 
-                String queryString = parseFromLogLine(line);
+                //System.out.println(m.group(4));
+                
+                String queryString = m.group(6);
                 String decodedQueryString = URLDecoder.decode(queryString, "UTF-8");
+                
+                if (queryString.toLowerCase().contains("21781")) {
+                    //System.out.println(queryString);
+                    System.out.println(m.group(4));
+                }
+                
 
-
-                List<NameValuePair> params = URLEncodedUtils.parse(new URI(decodedQueryString), Charset.forName("UTF-8"));
+                //System.out.println(decodedQueryString);
+                
+                // java.net.URISyntaxException
+                // Warum decode ich den Query-String? Hier fliegt er mir um die Ohren. 
+//                List<NameValuePair> params = URLEncodedUtils.parse(new URI(queryString), Charset.forName("UTF-8"));
 
                 //log.info(decodedQueryString);
-                for (NameValuePair param : params) {
-                    //System.out.println(param.getName() + " : " + param.getValue());
-                    
-                    
-                    if (param.getName().equalsIgnoreCase("LAYERS") && param.getValue().length() > 40) {
-                        //log.error("FUUUUUUBAR");
-                        System.out.println(param.getName() + " : " + param.getValue());
-                    }
-                }
+//                for (NameValuePair param : params) {
+//                    //System.out.println(param.getName() + " : " + param.getValue());
+//                    
+//                    
+//                    if (param.getName().equalsIgnoreCase("LAYERS") && param.getValue().length() > 40) {
+//                        //log.error("FUUUUUUBAR");
+//                        System.out.println(param.getName() + " : " + param.getValue());
+//                    }
+//                }
 
                
                i++;
@@ -64,13 +79,13 @@ public class LogParser {
     
     
     // https://databricks.gitbooks.io/databricks-spark-reference-applications/content/logs_analyzer/chapter1/java8/src/main/java/com/databricks/apps/logs/ApacheAccessLog.java
-    
-    public String parseFromLogLine(String logline) {
+    public Matcher parseFromLogLine(String logline) {
         Matcher m = PATTERN.matcher(logline);
         if (!m.find()) {
-          log.info("Cannot parse logline" + logline);
-          throw new RuntimeException("Error parsing logline");
+          //log.info("Cannot parse logline" + logline);
+          //throw new RuntimeException("Error parsing logline");
+          return null;
         }
-        return m.group(6);
+        return m;
     }
 }
