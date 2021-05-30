@@ -33,7 +33,7 @@ public class LogParser {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                //if (i>10000) break;
+                if (i>10000) break;
                 
                 Matcher m = parseFromLogLine(line);
                 
