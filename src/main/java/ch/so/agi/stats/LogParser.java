@@ -8,6 +8,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -22,9 +24,11 @@ public class LogParser {
     private static Logger log = LoggerFactory.getLogger(LogParser.class);
 
     private static final String LOG_ENTRY_PATTERN =
-            // 1:IP  2:client 3:user 4:date time 5:method 6:req 7:proto   8:respcode 9:size
+            // 1:IP  2:client 3:user 4:date time 5:method 6:req 7:proto 8:respcode 9:size
             "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\d+)";
     private static final Pattern PATTERN = Pattern.compile(LOG_ENTRY_PATTERN);
+    private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
+    
 
     public void parse(String fileName) throws FileNotFoundException, IOException, URISyntaxException {
         log.info(fileName);
@@ -34,6 +38,10 @@ public class LogParser {
             String line;
             while ((line = br.readLine()) != null) {
                 if (i>10000) break;
+                
+                // TODO:
+                // - Es gibt Zeilen mit Error o.ä. -> separat behandeln
+                // - ...
                 
                 Matcher m = parseFromLogLine(line);
                 
@@ -48,10 +56,25 @@ public class LogParser {
                 
                 if (queryString.toLowerCase().contains("21781")) {
                     //System.out.println(queryString);
-                    System.out.println(m.group(4));
+                    //System.out.println(m.group(4));
                 }
                 
-
+//                System.out.println("m0: " + m.group(0));
+//                System.out.println("m1: " + m.group(1));
+//                System.out.println("m2: " + m.group(2));
+//                System.out.println("m3: " + m.group(3));
+                System.out.println("m4: " + m.group(4));
+//                System.out.println("m5: " + m.group(5));
+//                System.out.println("m6: " + m.group(6));
+//                System.out.println("m7: " + m.group(7));
+//                System.out.println("m8: " + m.group(8));
+//                System.out.println("m9: " + m.group(9));
+                
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);
+                
+                System.out.println(zonedDateTime);
+                
                 //System.out.println(decodedQueryString);
                 
                 // java.net.URISyntaxException
