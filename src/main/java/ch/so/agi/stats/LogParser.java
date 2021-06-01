@@ -8,13 +8,24 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URLEncodedUtils;
 import org.slf4j.Logger;
@@ -29,51 +40,91 @@ public class LogParser {
     private static final Pattern PATTERN = Pattern.compile(LOG_ENTRY_PATTERN);
     private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
     
-
-    public void parse(String fileName) throws FileNotFoundException, IOException, URISyntaxException {
+    private static final String WMS_REQUEST_INSERT = "INSERT INTO wms_request (md5, ip, "
+            + "request_time, request_method, request, wms_request_type, wms_srs, wms_bbox, "
+            + "wms_width, wms_height) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    
+    public void doImport(Connection conn, String fileName) throws FileNotFoundException, IOException, URISyntaxException, SQLException {
         log.info(fileName);
+        
+        PreparedStatement pstmtRequest = conn.prepareStatement(WMS_REQUEST_INSERT, Statement.RETURN_GENERATED_KEYS);
         
         int i=0;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (i>10000) break;
+                //if (i>10000) break;
                 
                 // TODO:
                 // - Es gibt Zeilen mit Error o.ä. -> separat behandeln
-                // - ...
+                // - Gibt es wirklich viele doppelte Requests? -> in separate Tabelle?
+                // - Timezone? Was steht genau im Logfile? Was soll in der DB stehen?
                 
                 Matcher m = parseFromLogLine(line);
                 
                 if (m == null) {
                     continue;
-                }                
+                }              
                 
-                //System.out.println(m.group(4));
+                String md5 = DigestUtils.md5Hex(line).toUpperCase();
+                String ip = m.group(1);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+                ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);        
+                String requestMethod = m.group(5);
+                String request = m.group(6);
                 
-                String queryString = m.group(6);
-                String decodedQueryString = URLDecoder.decode(queryString, "UTF-8");
+                pstmtRequest.setString(1, md5);
+                pstmtRequest.setString(2, ip);
+                Timestamp timestamp = Timestamp.from(zonedDateTime.toInstant());
+                Calendar cal = GregorianCalendar.from(zonedDateTime);
+                pstmtRequest.setTimestamp(3, timestamp, cal);
+                pstmtRequest.setString(4, requestMethod);
+                pstmtRequest.setString(5, request);
+                pstmtRequest.setString(6, "foo");
+                pstmtRequest.setInt(7, 0);
+                pstmtRequest.setString(8, "foo");
+                pstmtRequest.setInt(9, 0);
+                pstmtRequest.setInt(10, 0);
                 
-                if (queryString.toLowerCase().contains("21781")) {
-                    //System.out.println(queryString);
-                    //System.out.println(m.group(4));
+                // TODO: Mist, da gibt es tatsächlich einige doppelte.
+                // D.h. Identische Zeit, identischer Request. Wie kann
+                // das sein?
+                // -> Wegspeichern?
+                try {
+                    int row = pstmtRequest.executeUpdate();
+                    
+                    ResultSet res = pstmtRequest.getGeneratedKeys();
+//                    while (res.next()) {
+//                        System.out.println(res.getString(1));
+//                     }
+
+                    
+                } catch (SQLException e) {
+                    e.printStackTrace();
                 }
+                
+//                String queryString = m.group(6);
+//                String decodedQueryString = URLDecoder.decode(queryString, "UTF-8");
+                
+//                if (queryString.toLowerCase().contains("21781")) {
+//                    //System.out.println(queryString);
+//                    //System.out.println(m.group(4));
+//                }
                 
 //                System.out.println("m0: " + m.group(0));
 //                System.out.println("m1: " + m.group(1));
 //                System.out.println("m2: " + m.group(2));
 //                System.out.println("m3: " + m.group(3));
-                System.out.println("m4: " + m.group(4));
+//                System.out.println("m4: " + m.group(4));
 //                System.out.println("m5: " + m.group(5));
 //                System.out.println("m6: " + m.group(6));
 //                System.out.println("m7: " + m.group(7));
 //                System.out.println("m8: " + m.group(8));
 //                System.out.println("m9: " + m.group(9));
                 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
-                ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);
                 
-                System.out.println(zonedDateTime);
+//                System.out.println(zonedDateTime);
+
                 
                 //System.out.println(decodedQueryString);
                 

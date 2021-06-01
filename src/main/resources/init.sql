@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS wms_request_layer;
 DROP TABLE IF EXISTS wms_request;
 
 CREATE TABLE wms_request ( 
