@@ -86,12 +86,7 @@ public class LogParser {
                 }              
                 
                 if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
-//                    try {
                         readWmsLine(m, line);
-//                    } catch (Exception e) {
-//                        log.error(line);
-//                    }
-                    
                 }
                 
 //                String decodedQueryString = URLDecoder.decode(queryString, "UTF-8");
