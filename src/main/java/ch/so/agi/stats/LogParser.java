@@ -148,7 +148,7 @@ public class LogParser {
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);        
         String requestMethod = m.group(5);
         String request = m.group(6);
-        String wmsequestType = null;
+        String wmsRequestType = null;
         int wmsSrs = -1;
         String wmsBbox = null;
         int wmsWidth = -1;
