@@ -1,8 +1,21 @@
+-- TODO:
+-- map-Aufrufe
+-- oereb
+-- Eigentümer
+-- Fehler
+-- WFS
+-- dataservice (GET und POST)
+-- print
+-- grundbuchplanauszug
+-- EWS 
+-- Reports
+-- searchtext
+
 DROP TABLE IF EXISTS wms_request_layer;
 DROP TABLE IF EXISTS wms_request;
-DROP SEQUENCE IF EXISTS ows_log_sequence;
+DROP SEQUENCE IF EXISTS api_log_sequence;
 
-CREATE SEQUENCE ows_log_sequence
+CREATE SEQUENCE api_log_sequence
   START WITH 1
   INCREMENT BY 1
   MINVALUE 1;
@@ -32,9 +45,9 @@ CREATE INDEX IF NOT EXISTS dpi_idx ON wms_request (dpi);
 CREATE TABLE wms_request_layer ( 
    id BIGINT NOT NULL PRIMARY KEY,
    request_id INTEGER,
-   layer VARCHAR(255),
+   layer_name VARCHAR(1024),
    foreign key (request_id) references wms_request(id)
 );
 
 CREATE INDEX IF NOT EXISTS request_id_idx ON wms_request_layer (request_id);
-CREATE INDEX IF NOT EXISTS layer_idx ON wms_request_layer (layer);
+CREATE INDEX IF NOT EXISTS layer_name_idx ON wms_request_layer (layer_name);

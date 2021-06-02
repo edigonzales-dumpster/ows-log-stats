@@ -47,14 +47,19 @@ public class LogParser {
     private static final String WMS_REQUEST_INSERT = "INSERT INTO wms_request (id, md5, ip, "
             + "request_time, request_method, request, wms_request_type, wms_srs, wms_bbox, "
             + "wms_width, wms_height, dpi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String WMS_REQUEST_LAYER_INSERT = "INSERT INTO wms_request_layer (id, "
+            + "request_id, layer_name) VALUES (?, ?, ?)";
+    
+    private static final String SEQUENCE_NAME = "api_log_sequence";
     
     Connection conn = null;
     PreparedStatement pstmtWms = null;
+    PreparedStatement pstmtWmsLayer = null;
     
     public LogParser(Connection conn) throws SQLException {
         this.conn = conn;
-        pstmtWms = conn.prepareStatement(WMS_REQUEST_INSERT, Statement.RETURN_GENERATED_KEYS);
-
+        pstmtWms = conn.prepareStatement(WMS_REQUEST_INSERT);
+        pstmtWmsLayer = conn.prepareStatement(WMS_REQUEST_LAYER_INSERT);
     }
     
     public void doImport(String fileName) throws FileNotFoundException, IOException, URISyntaxException, SQLException {
@@ -112,8 +117,6 @@ public class LogParser {
     private Matcher parseFromLogLine(String logline) {
         Matcher m = PATTERN.matcher(logline);
         if (!m.find()) {
-          //log.info("Cannot parse logline" + logline);
-          //throw new RuntimeException("Error parsing logline");
           return null;
         }
         return m;
@@ -134,14 +137,13 @@ public class LogParser {
         Integer wmsHeight = null;
         Double dpi = null;
         
+        String[] layers = new String[0];
         
         List<NameValuePair> params = URLEncodedUtils.parse(new URI(request), Charset.forName("UTF-8"));
         for (NameValuePair param : params) {
-            // System.out.println(param.getName() + " : " + param.getValue());
-
             String paramName = param.getName();
             String paramValue = param.getValue();
-
+            
             if (paramName.equalsIgnoreCase("request")) {
                 wmsRequestType = paramValue.toLowerCase();
             } else if (paramName.equalsIgnoreCase("srs") || paramName.equalsIgnoreCase("crs")) {
@@ -163,6 +165,9 @@ public class LogParser {
                 try {
                     dpi = Double.valueOf(paramValue);
                 } catch (NumberFormatException e) {}
+            } else if (paramName.equalsIgnoreCase("layers")) {
+                String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
+                layers = decodedValue.split(",");                
             }          
           
 //          if (param.getName().equalsIgnoreCase("LAYERS") && param.getValue().length() > 40) {
@@ -191,7 +196,13 @@ public class LogParser {
         // das sein?
         // -> Wegspeichern?
         try {
-            int row = pstmtWms.executeUpdate();            
+            pstmtWms.executeUpdate(); 
+            for (String layer : layers) {                
+                pstmtWmsLayer.setLong(1, getId());
+                pstmtWmsLayer.setLong(2, id);
+                pstmtWmsLayer.setString(3, layer);
+                pstmtWmsLayer.executeUpdate();
+            }
         } catch (SQLException e) {
             //log.error(line);
             //log.error("duplicate line");
@@ -200,7 +211,7 @@ public class LogParser {
     
     private Long getId() throws SQLException {
         Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT nextval('public.ows_log_sequence')");
+        ResultSet rs = stmt.executeQuery("SELECT nextval('"+SEQUENCE_NAME+"')");
         long id;
         while(rs.next()) {
             id = rs.getLong(1);

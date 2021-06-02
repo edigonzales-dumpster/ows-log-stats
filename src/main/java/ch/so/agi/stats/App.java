@@ -54,7 +54,8 @@ public class App {
             
             
             LogParser logparser = new LogParser(conn);
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
+            //logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc.log");
 
             
             
