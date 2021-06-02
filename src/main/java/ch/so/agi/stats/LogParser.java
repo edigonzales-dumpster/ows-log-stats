@@ -69,6 +69,8 @@ public class LogParser {
             while ((line = br.readLine()) != null) {
                 //if (i>10000) break;
                 
+                // TODO:
+                // - Statuscake ignorieren.
                 if (line.contains("piwik")) continue; 
                 
                 
