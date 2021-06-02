@@ -18,7 +18,8 @@ CREATE TABLE wms_request (
    wms_srs INTEGER,
    wms_bbox TEXT,
    wms_width INTEGER,
-   wms_height INTEGER
+   wms_height INTEGER,
+   dpi DOUBLE
 );
 
 CREATE INDEX IF NOT EXISTS request_time_idx ON wms_request (request_time);
@@ -26,6 +27,7 @@ CREATE INDEX IF NOT EXISTS wms_request_type_idx ON wms_request (wms_request_type
 CREATE INDEX IF NOT EXISTS wms_srs_idx ON wms_request (wms_srs);
 CREATE INDEX IF NOT EXISTS wms_width_idx ON wms_request (wms_width);
 CREATE INDEX IF NOT EXISTS wms_height_idx ON wms_request (wms_height);
+CREATE INDEX IF NOT EXISTS dpi_idx ON wms_request (dpi);
 
 CREATE TABLE wms_request_layer ( 
    id BIGINT NOT NULL PRIMARY KEY,
