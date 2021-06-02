@@ -53,8 +53,8 @@ public class App {
             
             
             
-            LogParser logparser = new LogParser();
-            logparser.doImport(conn, "/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
+            LogParser logparser = new LogParser(conn);
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
 
             
             

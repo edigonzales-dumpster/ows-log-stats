@@ -1,8 +1,14 @@
 DROP TABLE IF EXISTS wms_request_layer;
 DROP TABLE IF EXISTS wms_request;
+DROP SEQUENCE IF EXISTS ows_log_sequence;
+
+CREATE SEQUENCE ows_log_sequence
+  START WITH 1
+  INCREMENT BY 1
+  MINVALUE 1;
 
 CREATE TABLE wms_request ( 
-   id IDENTITY NOT NULL PRIMARY KEY,
+   id BIGINT NOT NULL PRIMARY KEY,
    md5 VARCHAR(255) NOT NULL UNIQUE,
    ip VARCHAR(15),
    request_time TIMESTAMP WITH TIME ZONE,
@@ -22,7 +28,7 @@ CREATE INDEX IF NOT EXISTS wms_width_idx ON wms_request (wms_width);
 CREATE INDEX IF NOT EXISTS wms_height_idx ON wms_request (wms_height);
 
 CREATE TABLE wms_request_layer ( 
-   id IDENTITY NOT NULL PRIMARY KEY,
+   id BIGINT NOT NULL PRIMARY KEY,
    request_id INTEGER,
    layer VARCHAR(255),
    foreign key (request_id) references wms_request(id)
