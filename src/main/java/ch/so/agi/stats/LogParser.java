@@ -70,18 +70,11 @@ public class LogParser {
                 i++;
 
                 //if (i>10000) break;
-                log.info("Zeile: " + i);
                 
                 if (line.toLowerCase().contains("piwik") || line.toLowerCase().contains("statuscake") ||
                         line.toLowerCase().contains("nagios")) continue; 
-                
-                // TODO:
-                // - Es gibt Zeilen mit Error o.ä. -> separat behandeln
-                // - Gibt es wirklich viele doppelte Requests? -> in separate Tabelle?
-                // - Timezone? Was steht genau im Logfile? Was soll in der DB stehen?
-                
+                                
                 Matcher m = parseFromLogLine(line);
-                
                 if (m == null) {
                     continue;
                 }              
@@ -89,12 +82,8 @@ public class LogParser {
                 if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
                         readWmsLine(m, line);
                 }
-                
-
             }
         }
-        
-        
     }
     
     
@@ -154,11 +143,6 @@ public class LogParser {
                 String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
                 layers = decodedValue.split(",");                
             }          
-          
-//          if (param.getName().equalsIgnoreCase("LAYERS") && param.getValue().length() > 40) {
-//              //log.error("FUUUUUUBAR");
-//              System.out.println(param.getName() + " : " + param.getValue());
-//          }
       }
         
       pstmtWms.setLong(1, id);
@@ -189,8 +173,7 @@ public class LogParser {
                 pstmtWmsLayer.executeUpdate();
             }
         } catch (SQLException e) {
-            //log.error(line);
-            //log.error("duplicate line");
+            // duplicate lines
         }
     }
     
