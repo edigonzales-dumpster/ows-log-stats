@@ -21,7 +21,7 @@ public class App {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, URISyntaxException {
         
-        String databasePath = "/Users/stefan/tmp/sogismon";
+        String databasePath = "/Users/stefan/tmp/api-gateway-log";
         boolean doInit = false;
         
         for(int i=0; i<args.length;i++) { 
@@ -37,7 +37,7 @@ public class App {
             
             
             if (doInit) {
-                String tmpDir = Files.createTempDirectory("sogismon").toFile().getAbsolutePath();
+                String tmpDir = Files.createTempDirectory("apigatewaylog").toFile().getAbsolutePath();
                 File tmpFile = new File(Paths.get(tmpDir, "init.sql").toFile().getAbsolutePath());
                 InputStream is = App.class.getResourceAsStream("/init.sql"); 
                 Files.copy(is, tmpFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -46,19 +46,12 @@ public class App {
                 
                 // init db
                 stmt.execute(content);
-                
-                
-
             }
             
-            
-            
             LogParser logparser = new LogParser(conn);
-            //logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
+            //logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc.log");
 
-            
-            
         } catch (SQLException e) {
             e.printStackTrace();
         }

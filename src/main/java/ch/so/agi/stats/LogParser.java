@@ -67,12 +67,13 @@ public class LogParser {
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
+                i++;
+
                 //if (i>10000) break;
+                log.info("Zeile: " + i);
                 
-                // TODO:
-                // - Statuscake ignorieren.
-                if (line.contains("piwik")) continue; 
-                
+                if (line.toLowerCase().contains("piwik") || line.toLowerCase().contains("statuscake") ||
+                        line.toLowerCase().contains("nagios")) continue; 
                 
                 // TODO:
                 // - Es gibt Zeilen mit Error o.ä. -> separat behandeln
@@ -89,20 +90,7 @@ public class LogParser {
                         readWmsLine(m, line);
                 }
                 
-//                String decodedQueryString = URLDecoder.decode(queryString, "UTF-8");
-                                
-//                System.out.println("m0: " + m.group(0));
-//                System.out.println("m1: " + m.group(1));
-//                System.out.println("m2: " + m.group(2));
-//                System.out.println("m3: " + m.group(3));
-//                System.out.println("m4: " + m.group(4));
-//                System.out.println("m5: " + m.group(5));
-//                System.out.println("m6: " + m.group(6));
-//                System.out.println("m7: " + m.group(7));
-//                System.out.println("m8: " + m.group(8));
-//                System.out.println("m9: " + m.group(9));
-                
-               i++;
+
             }
         }
         
