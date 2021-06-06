@@ -1,5 +1,5 @@
 -- TODO:
--- map-Aufrufe
+-- //map-Aufrufe
 -- oereb
 -- Eigentümer
 -- Fehler
@@ -8,7 +8,7 @@
 -- print
 -- grundbuchplanauszug
 -- EWS 
--- Reports
+-- //Reports
 -- searchtext
 -- getlegendgraphic
 -- Standortkarte

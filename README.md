@@ -3,7 +3,8 @@
 ## todo
 - schema support
 - h2 postgres mode, damit es auch mit postgres funktioniert?
-- referer in wms_request
+- referer (?)
+- abstract request class
 
 ## sql
 ```

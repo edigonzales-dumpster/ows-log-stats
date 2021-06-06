@@ -73,6 +73,11 @@ public class LogParser {
                         e.printStackTrace();
                     }
                 }
+                
+                // Eigentümerabfrage
+                // TODO
+                // not_contain("captcha"): Jede Eigentümerabfrage macht zwei Requests. Der erste 
+                // wegen des Captchas. Es kann auch positiv formuliert werden: contains("token").
             }
         }
     }
