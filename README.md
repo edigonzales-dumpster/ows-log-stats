@@ -5,6 +5,7 @@
 - h2 postgres mode, damit es auch mit postgres funktioniert?
 - referer (?)
 - abstract request class
+- query nur mit getmap
 
 ## sql
 ```

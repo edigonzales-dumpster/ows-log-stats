@@ -16,6 +16,7 @@
 DROP TABLE IF EXISTS wms_request_layer;
 DROP TABLE IF EXISTS wms_request;
 DROP TABLE IF EXISTS document_request;
+DROP TABLE IF EXISTS owner_request;
 DROP SEQUENCE IF EXISTS api_log_sequence;
 
 CREATE SEQUENCE api_log_sequence
@@ -67,3 +68,16 @@ CREATE TABLE document_request (
 
 CREATE INDEX IF NOT EXISTS request_time_idx ON document_request (request_time);
 CREATE INDEX IF NOT EXISTS document_idx ON document_request (document);
+
+CREATE TABLE owner_request ( 
+   id BIGINT NOT NULL PRIMARY KEY,
+   md5 VARCHAR(255) NOT NULL UNIQUE,
+   ip VARCHAR(15),
+   request_time TIMESTAMP WITH TIME ZONE,
+   request_method VARCHAR(4),
+   request TEXT,
+   egrid VARCHAR(255)
+);
+
+CREATE INDEX IF NOT EXISTS request_time_idx ON document_request (request_time);
+CREATE INDEX IF NOT EXISTS egrid_idx ON document_request (egrid);
