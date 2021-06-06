@@ -5,33 +5,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLDecoder;
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.hc.core5.http.NameValuePair;
-import org.apache.hc.core5.net.URLEncodedUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,35 +21,25 @@ public class LogParser {
             // 1:IP  2:client 3:user 4:date time 5:method 6:req 7:proto 8:respcode 9:size
             "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\d+)";
     private static final Pattern PATTERN = Pattern.compile(LOG_ENTRY_PATTERN);
-    private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
-    
-    private static final String WMS_REQUEST_INSERT = "INSERT INTO wms_request (id, md5, ip, "
-            + "request_time, request_method, request, wms_request_type, wms_srs, wms_bbox, "
-            + "wms_width, wms_height, dpi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String WMS_REQUEST_LAYER_INSERT = "INSERT INTO wms_request_layer (id, "
-            + "request_id, layer_name) VALUES (?, ?, ?)";
-    
-    private static final String SEQUENCE_NAME = "api_log_sequence";
     
     Connection conn = null;
-    PreparedStatement pstmtWms = null;
-    PreparedStatement pstmtWmsLayer = null;
+    WmsRequest wmsRequest = null;
     
     public LogParser(Connection conn) throws SQLException {
         this.conn = conn;
-        pstmtWms = conn.prepareStatement(WMS_REQUEST_INSERT);
-        pstmtWmsLayer = conn.prepareStatement(WMS_REQUEST_LAYER_INSERT);
+        wmsRequest = new WmsRequest(conn);
     }
     
-    public void doImport(String fileName) throws FileNotFoundException, IOException, URISyntaxException, SQLException {
+    public void doImport(String fileName) throws FileNotFoundException, IOException {
         int i=0;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
                 i++;
 
-                //if (i>10000) break;
+                //if (i>20000) break;
                 
+                // Ignore requests from health checks etc.
                 if (line.toLowerCase().contains("piwik") || line.toLowerCase().contains("statuscake") ||
                         line.toLowerCase().contains("nagios")) continue; 
                                 
@@ -79,8 +48,17 @@ public class LogParser {
                     continue;
                 }              
                 
+                // WMS requests
                 if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
-                        readWmsLine(m, line);
+                    try {
+                        wmsRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -94,98 +72,5 @@ public class LogParser {
           return null;
         }
         return m;
-    }
-    
-    private void readWmsLine(Matcher m, String line) throws SQLException, URISyntaxException, UnsupportedEncodingException {
-        long id = getId();
-        String md5 = DigestUtils.md5Hex(line).toUpperCase();
-        String ip = m.group(1);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);        
-        String requestMethod = m.group(5);
-        String request = m.group(6);
-        String wmsRequestType = null;
-        Integer wmsSrs = null;
-        String wmsBbox = null;
-        Integer wmsWidth = null;
-        Integer wmsHeight = null;
-        Double dpi = null;
-        
-        String[] layers = new String[0];
-        
-        List<NameValuePair> params = URLEncodedUtils.parse(new URI(request), Charset.forName("UTF-8"));
-        for (NameValuePair param : params) {
-            String paramName = param.getName();
-            String paramValue = param.getValue();
-            
-            if (paramName.equalsIgnoreCase("request")) {
-                wmsRequestType = paramValue.toLowerCase();
-            } else if (paramName.equalsIgnoreCase("srs") || paramName.equalsIgnoreCase("crs")) {
-                if (paramValue.length() > 5) {
-                    String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
-                    wmsSrs = Integer.valueOf(decodedValue.split(":")[1]);
-                }
-            } else if (paramName.equalsIgnoreCase("bbox")) {
-                wmsBbox = paramValue;
-            } else if (paramName.equalsIgnoreCase("width")) {
-                try {
-                    wmsWidth = Integer.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("height")) {
-                try {
-                    wmsHeight = Integer.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("dpi")) {
-                try {
-                    dpi = Double.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("layers")) {
-                String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
-                layers = decodedValue.split(",");                
-            }          
-      }
-        
-      pstmtWms.setLong(1, id);
-      pstmtWms.setString(2, md5);
-      pstmtWms.setString(3, ip);
-      Timestamp timestamp = Timestamp.from(zonedDateTime.toInstant());
-      Calendar cal = GregorianCalendar.from(zonedDateTime);
-      pstmtWms.setTimestamp(4, timestamp, cal);
-      pstmtWms.setString(5, requestMethod);
-      pstmtWms.setString(6, request);
-      pstmtWms.setString(7, wmsRequestType);
-      pstmtWms.setObject(8, wmsSrs, Types.INTEGER);
-      pstmtWms.setString(9, wmsBbox);
-      pstmtWms.setObject(10, wmsWidth, Types.INTEGER);
-      pstmtWms.setObject(11, wmsHeight, Types.INTEGER);
-      pstmtWms.setObject(12, dpi, Types.DOUBLE);
-        
-        // TODO: Mist, da gibt es tatsächlich einige doppelte.
-        // D.h. Identische Zeit, identischer Request. Wie kann
-        // das sein?
-        // -> Wegspeichern?
-        try {
-            pstmtWms.executeUpdate(); 
-            for (String layer : layers) {                
-                pstmtWmsLayer.setLong(1, getId());
-                pstmtWmsLayer.setLong(2, id);
-                pstmtWmsLayer.setString(3, layer);
-                pstmtWmsLayer.executeUpdate();
-            }
-        } catch (SQLException e) {
-            // duplicate lines
-        }
-    }
-    
-    private Long getId() throws SQLException {
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT nextval('"+SEQUENCE_NAME+"')");
-        long id;
-        while(rs.next()) {
-            id = rs.getLong(1);
-            stmt.close();
-            return id;
-        }
-        return null;
-    }
+    }    
 }
