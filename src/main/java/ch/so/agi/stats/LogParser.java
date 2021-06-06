@@ -24,10 +24,12 @@ public class LogParser {
     
     Connection conn = null;
     WmsRequest wmsRequest = null;
+    DocumentRequest docRequest = null;
     
     public LogParser(Connection conn) throws SQLException {
         this.conn = conn;
         wmsRequest = new WmsRequest(conn);
+        docRequest = new DocumentRequest(conn);
     }
     
     public void doImport(String fileName) throws FileNotFoundException, IOException {
@@ -37,7 +39,7 @@ public class LogParser {
             while ((line = br.readLine()) != null) {
                 i++;
 
-                //if (i>20000) break;
+                //if (i>200000) break;
                 
                 // Ignore requests from health checks etc.
                 if (line.toLowerCase().contains("piwik") || line.toLowerCase().contains("statuscake") ||
@@ -49,14 +51,25 @@ public class LogParser {
                 }              
                 
                 // WMS requests
-                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
+//                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
+//                    try {
+//                        wmsRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+                
+                // Document requests
+                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
                     try {
-                        wmsRequest.readLine(m, line);
+                        docRequest.readLine(m, line);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
                 }

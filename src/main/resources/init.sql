@@ -15,6 +15,7 @@
 
 DROP TABLE IF EXISTS wms_request_layer;
 DROP TABLE IF EXISTS wms_request;
+DROP TABLE IF EXISTS document_request;
 DROP SEQUENCE IF EXISTS api_log_sequence;
 
 CREATE SEQUENCE api_log_sequence
@@ -53,3 +54,16 @@ CREATE TABLE wms_request_layer (
 
 CREATE INDEX IF NOT EXISTS request_id_idx ON wms_request_layer (request_id);
 CREATE INDEX IF NOT EXISTS layer_name_idx ON wms_request_layer (layer_name);
+
+CREATE TABLE document_request ( 
+   id BIGINT NOT NULL PRIMARY KEY,
+   md5 VARCHAR(255) NOT NULL UNIQUE,
+   ip VARCHAR(15),
+   request_time TIMESTAMP WITH TIME ZONE,
+   request_method VARCHAR(4),
+   request TEXT,
+   document VARCHAR(255)
+);
+
+CREATE INDEX IF NOT EXISTS request_time_idx ON document_request (request_time);
+CREATE INDEX IF NOT EXISTS document_idx ON document_request (document);
