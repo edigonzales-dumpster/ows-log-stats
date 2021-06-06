@@ -21,7 +21,6 @@ import org.apache.hc.core5.net.URIBuilder;
 
 public class DocumentRequest {
     private static final String SEQUENCE_NAME = "api_log_sequence";
-
     private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
     private static final String WMS_REQUEST_INSERT = "INSERT INTO document_request (id, md5, ip, "
             + "request_time, request_method, request, document) "
