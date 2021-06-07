@@ -53,17 +53,17 @@ public class LogParser {
                 }              
                 
                 // WMS requests
-//                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
-//                    try {
-//                        wmsRequest.readLine(m, line);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
+                    try {
+                        wmsRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                }
                 
                 // Document requests
 //                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
