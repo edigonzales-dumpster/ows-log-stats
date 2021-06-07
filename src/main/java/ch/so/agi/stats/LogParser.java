@@ -25,11 +25,13 @@ public class LogParser {
     Connection conn = null;
     WmsRequest wmsRequest = null;
     DocumentRequest docRequest = null;
+    OwnerRequest ownerRequest = null;
     
     public LogParser(Connection conn) throws SQLException {
         this.conn = conn;
         wmsRequest = new WmsRequest(conn);
         docRequest = new DocumentRequest(conn);
+        ownerRequest = new OwnerRequest(conn);
     }
     
     public void doImport(String fileName) throws FileNotFoundException, IOException {
@@ -64,15 +66,27 @@ public class LogParser {
 //                }
                 
                 // Document requests
-                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+//                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+//                    try {
+//                        docRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+                // Owner requests
+                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
                     try {
-                        docRequest.readLine(m, line);
+                        ownerRequest.readLine(m, line);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
+
                 }
+                
                 
                 // Eigentümerabfrage
                 // TODO

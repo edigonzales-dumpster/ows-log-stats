@@ -79,5 +79,5 @@ CREATE TABLE owner_request (
    egrid VARCHAR(255)
 );
 
-CREATE INDEX IF NOT EXISTS request_time_idx ON document_request (request_time);
-CREATE INDEX IF NOT EXISTS egrid_idx ON document_request (egrid);
+CREATE INDEX IF NOT EXISTS request_time_idx ON owner_request (request_time);
+CREATE INDEX IF NOT EXISTS egrid_idx ON owner_request (egrid);
