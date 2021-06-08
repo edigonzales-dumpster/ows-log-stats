@@ -6,6 +6,7 @@
 - referer (?)
 - abstract request class
 - query nur mit getmap
+- print get nicht (wegen post?)
 
 ## sql
 ```
