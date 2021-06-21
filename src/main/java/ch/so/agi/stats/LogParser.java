@@ -66,15 +66,16 @@ public class LogParser {
                 }
                 
                 // Document requests
-//                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
-//                    try {
-//                        docRequest.readLine(m, line);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+                    try {
+                        docRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 // Owner requests
                 if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
                     try {
@@ -86,16 +87,9 @@ public class LogParser {
                     }
 
                 }
-                
-                
-                // Eigentümerabfrage
-                // TODO
-                // not_contain("captcha"): Jede Eigentümerabfrage macht zwei Requests. Der erste 
-                // wegen des Captchas. Es kann auch positiv formuliert werden: contains("token").
             }
         }
     }
-    
     
     // https://databricks.gitbooks.io/databricks-spark-reference-applications/content/logs_analyzer/chapter1/java8/src/main/java/com/databricks/apps/logs/ApacheAccessLog.java
     private Matcher parseFromLogLine(String logline) {

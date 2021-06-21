@@ -8,6 +8,11 @@
 - query nur mit getmap
 - print get nicht (wegen post?)
 
+## run
+```
+./gradlew run --args="--init"
+```
+
 ## sql
 ```
 SELECT 
