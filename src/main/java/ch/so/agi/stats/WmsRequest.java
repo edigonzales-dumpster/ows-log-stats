@@ -22,9 +22,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
 
-public class WmsRequest {
-    private static final String SEQUENCE_NAME = "api_log_sequence";
-
+public class WmsRequest extends AbstractRequest implements IRequest {
     private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
     private static final String WMS_REQUEST_INSERT = "INSERT INTO wms_request (id, md5, ip, "
             + "request_time, request_method, request, wms_request_type, wms_srs, wms_bbox, "
@@ -32,16 +30,16 @@ public class WmsRequest {
     private static final String WMS_REQUEST_LAYER_INSERT = "INSERT INTO wms_request_layer (id, "
             + "request_id, layer_name) VALUES (?, ?, ?)";
 
-    Connection conn = null;
     PreparedStatement pstmt = null;
     PreparedStatement pstmtLayer = null;
 
     public WmsRequest(Connection conn) throws SQLException {
-        this.conn = conn;
+        super(conn);
         pstmt = conn.prepareStatement(WMS_REQUEST_INSERT);
         pstmtLayer = conn.prepareStatement(WMS_REQUEST_LAYER_INSERT);
     }
     
+    @Override
     public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException { 
         long id = getId();
         String md5 = DigestUtils.md5Hex(line).toUpperCase();
@@ -121,19 +119,5 @@ public class WmsRequest {
         } catch (SQLException e) {
             // duplicate lines
         }
-    }
-    
-    private Long getId() throws SQLException {
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT nextval('"+SEQUENCE_NAME+"')");
-        long id;
-        while(rs.next()) {
-            id = rs.getLong(1);
-            stmt.close();
-            return id;
-        }
-        return null;
-    }
-
-    
+    }    
 }

@@ -17,11 +17,7 @@ public abstract class AbstractRequest {
     public AbstractRequest(Connection conn) throws SQLException {
         this.conn = conn;
     }
-    
-    public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException {
         
-    }
-    
     protected Long getId() throws SQLException {
         Statement stmt = conn.createStatement();
         ResultSet rs = stmt.executeQuery("SELECT nextval('"+SEQUENCE_NAME+"')");

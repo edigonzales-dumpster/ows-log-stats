@@ -19,24 +19,19 @@ import java.util.regex.Matcher;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hc.core5.net.URIBuilder;
 
-public class DocumentRequest {
-    private static final String SEQUENCE_NAME = "api_log_sequence";
+public class DocumentRequest extends AbstractRequest implements IRequest {
     private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
     private static final String WMS_REQUEST_INSERT = "INSERT INTO document_request (id, md5, ip, "
             + "request_time, request_method, request, document) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    Connection conn = null;
-    PreparedStatement pstmt = null;
+    private PreparedStatement pstmt = null;
     
     public DocumentRequest(Connection conn) throws SQLException {
-        this.conn = conn;
+        super(conn);
         pstmt = conn.prepareStatement(WMS_REQUEST_INSERT);
     }
     
-    public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException { 
-//        System.out.println(line);
-        
+    public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException {         
         long id = getId();
         String md5 = DigestUtils.md5Hex(line).toUpperCase();
         String ip = m.group(1);
@@ -64,17 +59,5 @@ public class DocumentRequest {
         } catch (SQLException e) {
             // duplicate lines
         }        
-    }
-    
-    private Long getId() throws SQLException {
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery("SELECT nextval('"+SEQUENCE_NAME+"')");
-        long id;
-        while(rs.next()) {
-            id = rs.getLong(1);
-            stmt.close();
-            return id;
-        }
-        return null;
     }
 }

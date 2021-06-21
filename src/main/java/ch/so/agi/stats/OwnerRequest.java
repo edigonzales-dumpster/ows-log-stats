@@ -17,7 +17,7 @@ import java.util.regex.Matcher;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hc.core5.net.URIBuilder;
 
-public class OwnerRequest extends AbstractRequest {
+public class OwnerRequest extends AbstractRequest implements IRequest {
     private static final String OWNER_REQUEST_INSERT = "INSERT INTO owner_request (id, md5, ip, "
             + "request_time, request_method, request, egrid) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -57,8 +57,5 @@ public class OwnerRequest extends AbstractRequest {
         } catch (SQLException e) {
             // duplicate lines
         }        
-
-
     }
-
 }
