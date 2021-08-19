@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+
 public class LogParser {
     private static Logger log = LoggerFactory.getLogger(LogParser.class);
 
@@ -31,16 +33,18 @@ public class LogParser {
     WfsRequest wfsRequest = null;
     DocumentRequest docRequest = null;
     OwnerRequest ownerRequest = null;
+    DataserviceRequest dataserviceRequest = null;
     
-    public LogParser(Connection conn) throws SQLException {
+    public LogParser(Connection conn) throws SQLException, IOException {
         this.conn = conn;
         wmsRequest = new WmsRequest(conn);
         wfsRequest = new WfsRequest(conn);
         docRequest = new DocumentRequest(conn);
         ownerRequest = new OwnerRequest(conn);
+        dataserviceRequest = new DataserviceRequest(conn);
     }
     
-    public void doImport(String fileName) throws FileNotFoundException, IOException {
+    public void doImport(String fileName) throws FileNotFoundException, IOException, GeoIp2Exception {
         int i=0;
         try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
             String line;
@@ -84,28 +88,38 @@ public class LogParser {
                     }
                 }
                 
-//                // Document requests
-//                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
-//                    try {
-//                        docRequest.readLine(m, line);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
+                // Document requests
+                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+                    try {
+                        docRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
 
-//                // Owner requests
-//                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
-//                    try {
-//                        ownerRequest.readLine(m, line);
-//                    } catch (URISyntaxException e) {
-//                        e.printStackTrace();
-//                    } catch (SQLException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                }
+                // Owner requests
+                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
+                    try {
+                        ownerRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // Dataservice requests
+                if(line.toLowerCase().contains("data/v1") && !line.toLowerCase().contains("/api/data/v1/api") && !line.toLowerCase().contains("swagger")) {
+                    try {
+                        dataserviceRequest.readLine(m, line);
+                    } catch (URISyntaxException e) {
+                        e.printStackTrace();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     }

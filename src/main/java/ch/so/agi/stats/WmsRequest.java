@@ -1,5 +1,6 @@
 package ch.so.agi.stats;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -33,7 +34,7 @@ public class WmsRequest extends AbstractRequest implements IRequest {
     PreparedStatement pstmt = null;
     PreparedStatement pstmtLayer = null;
 
-    public WmsRequest(Connection conn) throws SQLException {
+    public WmsRequest(Connection conn) throws SQLException, IOException {
         super(conn);
         pstmt = conn.prepareStatement(WMS_REQUEST_INSERT);
         pstmtLayer = conn.prepareStatement(WMS_REQUEST_LAYER_INSERT);

@@ -3,6 +3,8 @@ package ch.so.agi.stats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.maxmind.geoip2.exception.GeoIp2Exception;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -19,7 +21,7 @@ import java.sql.Statement;
 public class App {
     static Logger log = LoggerFactory.getLogger(App.class);
 
-    public static void main(String[] args) throws FileNotFoundException, IOException, URISyntaxException {
+    public static void main(String[] args) throws FileNotFoundException, IOException, URISyntaxException, GeoIp2Exception {
         
         String databasePath = "/Users/stefan/tmp/api-gateway-log-v2";
         boolean doInit = false;

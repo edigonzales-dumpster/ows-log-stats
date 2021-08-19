@@ -18,6 +18,7 @@ DROP TABLE IF EXISTS wms_request;
 DROP TABLE IF EXISTS wfs_request;
 DROP TABLE IF EXISTS document_request;
 DROP TABLE IF EXISTS owner_request;
+DROP TABLE IF EXISTS dataservice_request;
 DROP SEQUENCE IF EXISTS api_log_sequence;
 
 CREATE SEQUENCE api_log_sequence
@@ -100,3 +101,19 @@ CREATE TABLE owner_request (
 
 CREATE INDEX IF NOT EXISTS request_time_idx ON owner_request (request_time);
 CREATE INDEX IF NOT EXISTS egrid_idx ON owner_request (egrid);
+
+CREATE TABLE dataservice_request ( 
+   id BIGINT NOT NULL PRIMARY KEY,
+   md5 VARCHAR(255) NOT NULL UNIQUE,
+   ip VARCHAR(15),
+   request_time TIMESTAMP WITH TIME ZONE,
+   request_method VARCHAR(4),
+   request TEXT,
+   dataset VARCHAR(1024),
+   filter VARCHAR(1024)
+);
+
+CREATE INDEX IF NOT EXISTS request_time_idx ON dataservice_request (request_time);
+CREATE INDEX IF NOT EXISTS dataset_idx ON dataservice_request (dataset);
+CREATE INDEX IF NOT EXISTS filter_idx ON dataservice_request (filter);
+

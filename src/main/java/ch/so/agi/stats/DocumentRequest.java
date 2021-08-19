@@ -1,5 +1,6 @@
 package ch.so.agi.stats;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
@@ -26,7 +27,7 @@ public class DocumentRequest extends AbstractRequest implements IRequest {
             + "VALUES (?, ?, ?, ?, ?, ?, ?)";
     private PreparedStatement pstmt = null;
     
-    public DocumentRequest(Connection conn) throws SQLException {
+    public DocumentRequest(Connection conn) throws SQLException, IOException {
         super(conn);
         pstmt = conn.prepareStatement(WMS_REQUEST_INSERT);
     }
@@ -34,11 +35,11 @@ public class DocumentRequest extends AbstractRequest implements IRequest {
     public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException {         
         long id = getId();
         String md5 = DigestUtils.md5Hex(line).toUpperCase();
-        String ip = m.group(1);
+        String ip = m.group(2);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
-        ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(4), formatter);        
-        String requestMethod = m.group(5).toLowerCase();
-        String request = m.group(6);
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(1), formatter);        
+        String requestMethod = m.group(6).toLowerCase();
+        String request = m.group(7);
         
         URIBuilder builder = new URIBuilder(request, Charset.forName("UTF-8"));
         List<String> pathSegments = builder.getPathSegments();

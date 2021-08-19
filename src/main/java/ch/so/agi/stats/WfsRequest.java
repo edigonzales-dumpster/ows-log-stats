@@ -1,5 +1,6 @@
 package ch.so.agi.stats;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
@@ -30,7 +31,7 @@ public class WfsRequest extends AbstractRequest implements IRequest {
        
     PreparedStatement pstmt = null;
 
-    public WfsRequest(Connection conn) throws SQLException {
+    public WfsRequest(Connection conn) throws SQLException, IOException {
         super(conn);
         pstmt = conn.prepareStatement(WFS_REQUEST_INSERT);
     }
