@@ -19,17 +19,23 @@ public class LogParser {
 
     private static final String LOG_ENTRY_PATTERN =
             // 1:IP  2:client 3:user 4:date time 5:method 6:req 7:proto 8:respcode 9:size
-            "^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\d+)";
+            //"^(\\S+) (\\S+) (\\S+) \\[([\\w:/]+\\s[+\\-]\\d{4})\\] \"(\\S+) (\\S+) (\\S+)\" (\\d{3}) (\\d+)";
+    
+            // neu (ab 2021-08):
+            "^\\[([\\w:/]+\\s[+\\-]\\d{4})\\] (\\S+) (\\S+) (\\S+) (\\S+) \"(\\S+) (\\S+) (\\S+)\" (\\S+) (\\d+)";
+
     private static final Pattern PATTERN = Pattern.compile(LOG_ENTRY_PATTERN);
     
     Connection conn = null;
     WmsRequest wmsRequest = null;
+    WfsRequest wfsRequest = null;
     DocumentRequest docRequest = null;
     OwnerRequest ownerRequest = null;
     
     public LogParser(Connection conn) throws SQLException {
         this.conn = conn;
         wmsRequest = new WmsRequest(conn);
+        wfsRequest = new WfsRequest(conn);
         docRequest = new DocumentRequest(conn);
         ownerRequest = new OwnerRequest(conn);
     }
@@ -51,7 +57,7 @@ public class LogParser {
                 if (m == null) {
                     continue;
                 }              
-                
+                                
                 // WMS requests
                 if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
                     try {
@@ -65,28 +71,41 @@ public class LogParser {
                     }
                 }
                 
-                // Document requests
-                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+                // WFS requests
+                if (line.toLowerCase().contains("wfs") && line.toLowerCase().contains("service") && line.toLowerCase().contains("getfeature")) {
                     try {
-                        docRequest.readLine(m, line);
+                        wfsRequest.readLine(m, line);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } catch (SQLException e) {
                         e.printStackTrace();
-                    }
-                }
-
-                // Owner requests
-                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
-                    try {
-                        ownerRequest.readLine(m, line);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
+                    } catch (UnsupportedEncodingException e) {
                         e.printStackTrace();
                     }
-
                 }
+                
+//                // Document requests
+//                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+//                    try {
+//                        docRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+
+//                // Owner requests
+//                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
+//                    try {
+//                        ownerRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
             }
         }
     }

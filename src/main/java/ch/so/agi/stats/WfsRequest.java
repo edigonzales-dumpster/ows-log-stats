@@ -22,25 +22,31 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.net.URIBuilder;
 
-public class WmsRequest extends AbstractRequest implements IRequest {
+public class WfsRequest extends AbstractRequest implements IRequest {
     private static final String DATETIME_FORMAT = "dd/MMM/yyyy:HH:mm:ss Z";
-    private static final String WMS_REQUEST_INSERT = "INSERT INTO wms_request (id, md5, ip, "
-            + "request_time, request_method, request, wms_request_type, wms_srs, wms_bbox, "
-            + "wms_width, wms_height, dpi) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String WMS_REQUEST_LAYER_INSERT = "INSERT INTO wms_request_layer (id, "
-            + "request_id, layer_name) VALUES (?, ?, ?)";
-
+    private static final String WFS_REQUEST_INSERT = "INSERT INTO wfs_request (id, md5, ip, "
+            + "request_time, request_method, request, wfs_request_type, wfs_srs, wfs_bbox, "
+            + "wfs_typename) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+       
     PreparedStatement pstmt = null;
-    PreparedStatement pstmtLayer = null;
 
-    public WmsRequest(Connection conn) throws SQLException {
+    public WfsRequest(Connection conn) throws SQLException {
         super(conn);
-        pstmt = conn.prepareStatement(WMS_REQUEST_INSERT);
-        pstmtLayer = conn.prepareStatement(WMS_REQUEST_LAYER_INSERT);
+        pstmt = conn.prepareStatement(WFS_REQUEST_INSERT);
     }
     
     @Override
-    public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException { 
+    public void readLine(Matcher m, String line) throws URISyntaxException, SQLException, UnsupportedEncodingException {
+        //System.out.println(m.group(1));
+        //System.out.println(m.group(2));
+        //System.out.println(m.group(3));
+        //System.out.println(m.group(4));
+        //System.out.println(m.group(5));
+       // System.out.println(m.group(6));
+       // System.out.println(m.group(7));
+        //System.out.println(m.group(8));
+        
+        
         long id = getId();
         String md5 = DigestUtils.md5Hex(line).toUpperCase();
         String ip = m.group(2);
@@ -48,14 +54,10 @@ public class WmsRequest extends AbstractRequest implements IRequest {
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(m.group(1), formatter);        
         String requestMethod = m.group(6).toLowerCase();
         String request = m.group(7);
-        String wmsRequestType = null;
-        Integer wmsSrs = null;
-        String wmsBbox = null;
-        Integer wmsWidth = null;
-        Integer wmsHeight = null;
-        Double dpi = null;
-        
-        String[] layers = new String[0];
+        String wfsRequestType = null;
+        Integer wfsSrs = null;
+        String wfsBbox = null;
+        String wfsTypename = null;
         
         URIBuilder builder = new URIBuilder(request, Charset.forName("UTF-8"));
         List<NameValuePair> params = builder.getQueryParams();
@@ -64,29 +66,16 @@ public class WmsRequest extends AbstractRequest implements IRequest {
             String paramValue = param.getValue();
             
             if (paramName.equalsIgnoreCase("request")) {
-                wmsRequestType = paramValue.toLowerCase();
+                wfsRequestType = paramValue.toLowerCase();
             } else if (paramName.equalsIgnoreCase("srs") || paramName.equalsIgnoreCase("crs")) {
                 if (paramValue.length() > 5) {
                     String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
-                    wmsSrs = Integer.valueOf(decodedValue.split(":")[1]);
+                    wfsSrs = Integer.valueOf(decodedValue.split(":")[1]);
                 }
             } else if (paramName.equalsIgnoreCase("bbox")) {
-                wmsBbox = paramValue;
-            } else if (paramName.equalsIgnoreCase("width")) {
-                try {
-                    wmsWidth = Integer.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("height")) {
-                try {
-                    wmsHeight = Integer.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("dpi")) {
-                try {
-                    dpi = Double.valueOf(paramValue);
-                } catch (NumberFormatException e) {}
-            } else if (paramName.equalsIgnoreCase("layers")) {
-                String decodedValue = URLDecoder.decode(paramValue, "UTF-8");
-                layers = decodedValue.split(",");                
+                wfsBbox = paramValue;
+            } else if (paramName.equalsIgnoreCase("typename")) {
+                wfsTypename = paramValue;
             }          
         }
         
@@ -99,23 +88,15 @@ public class WmsRequest extends AbstractRequest implements IRequest {
         pstmt.setTimestamp(4, timestamp, cal);
         pstmt.setString(5, requestMethod);
         pstmt.setString(6, request);
-        pstmt.setString(7, wmsRequestType);
-        pstmt.setObject(8, wmsSrs, Types.INTEGER);
-        pstmt.setString(9, wmsBbox);
-        pstmt.setObject(10, wmsWidth, Types.INTEGER);
-        pstmt.setObject(11, wmsHeight, Types.INTEGER);
-        pstmt.setObject(12, dpi, Types.DOUBLE);
+        pstmt.setString(7, wfsRequestType);
+        pstmt.setObject(8, wfsSrs, Types.INTEGER);
+        pstmt.setString(9, wfsBbox);
+        pstmt.setObject(10, wfsTypename);
           
         // Es gibt identische Einträge im Logfile. Ob das tatsächlich identische
         // Requests sind?
         try {
             pstmt.executeUpdate();
-            for (String layer : layers) {
-                pstmtLayer.setLong(1, getId());
-                pstmtLayer.setLong(2, id);
-                pstmtLayer.setString(3, layer);
-                pstmtLayer.executeUpdate();
-            }
         } catch (SQLException e) {
             // duplicate lines
         }

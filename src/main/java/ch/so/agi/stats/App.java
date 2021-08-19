@@ -21,7 +21,7 @@ public class App {
 
     public static void main(String[] args) throws FileNotFoundException, IOException, URISyntaxException {
         
-        String databasePath = "/Users/stefan/tmp/api-gateway-log";
+        String databasePath = "/Users/stefan/tmp/api-gateway-log-v2";
         boolean doInit = false;
         
         for(int i=0; i<args.length;i++) { 
@@ -49,20 +49,18 @@ public class App {
             }
             
             LogParser logparser = new LogParser(conn);
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb.log");
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc.log");
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-scx2z.log");
-            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-xqqgw.log");
+//            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/00-api-gateway-10-9f9kb_20210531.log");
+//            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc_20210531.log");
+//            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-scx2z_20210621.log");
+//            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-xqqgw_20210621.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-14-fnptr_20210813.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-14-mszbm_20210813.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-14-fnptr_20210818.log");
+            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-14-mszbm_20210818.log");
 
         } catch (SQLException e) {
+            log.error(e.getMessage());
             e.printStackTrace();
         }
-
-        
-        
-        
-        
-        
-        System.out.println("Hallo Welt.");
     }
 }
