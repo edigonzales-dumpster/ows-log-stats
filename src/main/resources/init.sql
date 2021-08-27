@@ -19,7 +19,9 @@ DROP TABLE IF EXISTS wfs_request;
 DROP TABLE IF EXISTS document_request;
 DROP TABLE IF EXISTS owner_request;
 DROP TABLE IF EXISTS dataservice_request;
+DROP TABLE IF EXISTS searchtext_request;
 DROP TABLE IF EXISTS matomo_add_layer;
+DROP TABLE IF EXISTS matomo_searchtext;
 DROP SEQUENCE IF EXISTS api_log_sequence;
 
 CREATE SEQUENCE api_log_sequence
@@ -118,6 +120,19 @@ CREATE INDEX IF NOT EXISTS dataservice_request_request_time_idx ON dataservice_r
 CREATE INDEX IF NOT EXISTS dataservice_request_dataset_idx ON dataservice_request (dataset);
 CREATE INDEX IF NOT EXISTS dataservice_request_filter_idx ON dataservice_request (filter);
 
+CREATE TABLE searchtext_request ( 
+   id BIGINT NOT NULL PRIMARY KEY,
+   md5 VARCHAR(255) NOT NULL UNIQUE,
+   ip VARCHAR(15),
+   request_time TIMESTAMP WITH TIME ZONE,
+   request_method VARCHAR(4),
+   request TEXT,
+   searchtext VARCHAR(1024)
+);
+
+CREATE INDEX IF NOT EXISTS searchtext_request_request_time_idx ON searchtext_request (request_time);
+CREATE INDEX IF NOT EXISTS searchtext_request_document_idx ON searchtext_request (searchtext);
+
 CREATE TABLE matomo_add_layer ( 
    id BIGINT NOT NULL PRIMARY KEY,
    year INTEGER,
@@ -129,3 +144,16 @@ CREATE TABLE matomo_add_layer (
 CREATE INDEX IF NOT EXISTS matomo_add_layer_year_idx ON matomo_add_layer (year);
 CREATE INDEX IF NOT EXISTS matomo_add_layer_month_idx ON matomo_add_layer (month);
 CREATE INDEX IF NOT EXISTS matomo_add_layer_layername_idx ON matomo_add_layer (layername);
+
+
+CREATE TABLE matomo_searchtext ( 
+   id BIGINT NOT NULL PRIMARY KEY,
+   year INTEGER,
+   month INTEGER,
+   searchtext VARCHAR(1024),
+   acount INTEGER
+);
+
+CREATE INDEX IF NOT EXISTS matomo_add_layer_year_idx ON matomo_add_layer (year);
+CREATE INDEX IF NOT EXISTS matomo_add_layer_month_idx ON matomo_add_layer (month);
+CREATE INDEX IF NOT EXISTS matomo_add_layer_searchtext_idx ON matomo_add_layer (searchtext);

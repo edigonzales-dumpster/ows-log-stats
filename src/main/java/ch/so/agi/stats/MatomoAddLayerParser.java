@@ -13,18 +13,19 @@ import java.sql.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MatomoParser {
+public class MatomoAddLayerParser {
     private static Logger log = LoggerFactory.getLogger(LogParser.class);
 
     private static final String SEQUENCE_NAME = "api_log_sequence";
 
     private Connection conn = null;
+    private PreparedStatement pstmt = null;
+
     private static final String INSERT_STMT = "INSERT INTO matomo_add_layer (id, year, month, "
             + "layername, acount) "
             + "VALUES (?, ?, ?, ?, ?)";
-    private PreparedStatement pstmt = null;
-
-    public MatomoParser(Connection conn) throws SQLException {
+    
+    public MatomoAddLayerParser(Connection conn) throws SQLException {
         this.conn = conn;
         pstmt = conn.prepareStatement(INSERT_STMT);
     }

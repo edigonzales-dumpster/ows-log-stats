@@ -34,6 +34,7 @@ public class LogParser {
     DocumentRequest docRequest = null;
     OwnerRequest ownerRequest = null;
     DataserviceRequest dataserviceRequest = null;
+    SearchtextRequest searchtextRequest = null;
     
     public LogParser(Connection conn) throws SQLException, IOException {
         this.conn = conn;
@@ -42,6 +43,7 @@ public class LogParser {
         docRequest = new DocumentRequest(conn);
         ownerRequest = new OwnerRequest(conn);
         dataserviceRequest = new DataserviceRequest(conn);
+        searchtextRequest = new SearchtextRequest(conn);
     }
     
     public void doImport(String fileName) throws FileNotFoundException, IOException, GeoIp2Exception {
@@ -62,58 +64,69 @@ public class LogParser {
                     continue;
                 }              
                                 
-                // WMS requests
-                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
-                    try {
-                        wmsRequest.readLine(m, line);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
+//                // WMS requests
+//                if (line.toLowerCase().contains("wms") && line.toLowerCase().contains("service") && line.toLowerCase().contains("request")) {
+//                    try {
+//                        wmsRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                
+//                // WFS requests
+//                if (line.toLowerCase().contains("wfs") && line.toLowerCase().contains("service") && line.toLowerCase().contains("getfeature")) {
+//                    try {
+//                        wfsRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    } catch (UnsupportedEncodingException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                
+//                // Document requests
+//                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
+//                    try {
+//                        docRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                // Owner requests
+//                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
+//                    try {
+//                        ownerRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                // Dataservice requests
+//                if(line.toLowerCase().contains("data/v1") && !line.toLowerCase().contains("/api/data/v1/api") && !line.toLowerCase().contains("swagger")) {
+//                    try {
+//                        dataserviceRequest.readLine(m, line);
+//                    } catch (URISyntaxException e) {
+//                        e.printStackTrace();
+//                    } catch (SQLException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
                 
-                // WFS requests
-                if (line.toLowerCase().contains("wfs") && line.toLowerCase().contains("service") && line.toLowerCase().contains("getfeature")) {
+                // Searchtext requests
+                if(line.toLowerCase().contains("api/search/v2") && line.toLowerCase().contains("searchtext")) {
                     try {
-                        wfsRequest.readLine(m, line);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    } catch (UnsupportedEncodingException e) {
-                        e.printStackTrace();
-                    }
-                }
-                
-                // Document requests
-                if (line.toLowerCase().contains("get") && line.toLowerCase().contains("api") && line.toLowerCase().contains("document")) {                    
-                    try {
-                        docRequest.readLine(m, line);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Owner requests
-                if(line.toLowerCase().contains("owner") && line.toLowerCase().contains("token")) {
-                    try {
-                        ownerRequest.readLine(m, line);
-                    } catch (URISyntaxException e) {
-                        e.printStackTrace();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                // Dataservice requests
-                if(line.toLowerCase().contains("data/v1") && !line.toLowerCase().contains("/api/data/v1/api") && !line.toLowerCase().contains("swagger")) {
-                    try {
-                        dataserviceRequest.readLine(m, line);
+                        searchtextRequest.readLine(m, line);
                     } catch (URISyntaxException e) {
                         e.printStackTrace();
                     } catch (SQLException e) {

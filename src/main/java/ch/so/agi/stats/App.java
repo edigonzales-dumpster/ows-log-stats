@@ -55,15 +55,20 @@ public class App {
 //            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/01-api-gateway-10-nrfvc_20210531.log");
 //            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-scx2z_20210621.log");
 //            logparser.doImport("/Users/stefan/Downloads/api-gateway-logs/api-gateway-10-xqqgw_20210621.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-fnptr_20210813.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-mszbm_20210813.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-fnptr_20210818.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-mszbm_20210818.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-nbvvv_20210823.log");
-            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-tckr8_20210823.log");
+            
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-fnptr_20210813.log");
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-mszbm_20210813.log");
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-fnptr_20210818.log");
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-mszbm_20210818.log");
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-nbvvv_20210823.log");
+//            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-tckr8_20210823.log");
+            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-nbvvv_20210827.log");
+            logparser.doImport("/Users/stefan/tmp/api-gateway-logs/api-gateway-14-tckr8_20210827.log");
             
             //MatomoParser matomoparser = new MatomoParser(conn);
             //matomoparser.doImport("/Users/stefan/tmp/api-gateway-logs/addLayerEvent-2021-07.csv");
+            //MatomoSearchtextParser matomoSearchtextParser = new MatomoSearchtextParser(conn);
+            //matomoSearchtextParser.doImport("/Users/stefan/tmp/api-gateway-logs/searchTextEvent-2021-07.csv");
 
         } catch (SQLException e) {
             log.error(e.getMessage());
